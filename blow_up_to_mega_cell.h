@@ -20,8 +20,7 @@
  * The input parameter is the parameter of unit cell computed by read_information_about_unit_cell_from_zeopp_file function
 **/ 
 std::vector< std::vector< double > > compute_translation_vector( const std::vector< double >& parameters_of_unit_cell ) 
-{
-	bool dbg = false;
+{	
 	//first we need to transalte the strange zeo++ based const std::vector< double >& parameters_of_unit_cell into nice vectors in R^3:
 	std::vector< double > vector_1(3);
 	std::vector< double > vector_2(3);

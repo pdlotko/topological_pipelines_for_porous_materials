@@ -24,7 +24,7 @@ using namespace std;
 int main( int argc , char** argv )
 {
 	std::cout << "The obligatory parameter of the program is: \n";
-	std::cout << "(1) The name of cxxs file (string). Please provide it WITHOUT extension. \n";		
+	std::cout << "(1) The name of cxxs file (string) (with extension). \n";		
 	std::cout << "(2) The accesibe surface area (double). \n";
 	std::cout << "The optional parameters of this program are: \n";
 	std::cout << "(3) (double) - number of points per surface area. Set to 0.5 by default. \n";
@@ -37,7 +37,8 @@ int main( int argc , char** argv )
 	{
 		std::cout << "Wrong number of parameters, the program will now terminate.\n";
 	}
-	const char* filename = argv[1];
+	std::string filename_full_str = string(argv[1]);
+	string filename = filename_full_str.substr(0,filename_full_str.size()-5);
 	double surface_area = atof( argv[2] );
 	if ( argc > 3 )
 	{

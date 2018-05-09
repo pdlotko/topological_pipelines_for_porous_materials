@@ -22,13 +22,15 @@ using namespace std;
 
 int main( int argc , char** argv )
 {
-	std::cout << "The obligatory parameter of the program is the cxxs file. Please provide it WITHOUT extension. \n";	
+	std::cout << "The obligatory parameter of the program is the cxxs file (with extension). \n";	
+	std::cout << "Please note that prior to execution of this procedure, one should run the subsample_pore_surface, which will create a file with a point cloud sampled from the pores of the considered structure.\n";
 	if ( argc == 1 )  
 	{
 		std::cerr << "Wrong number of parameters, the program will now terminate. \n";
 		return 1;		
 	}
-	const char* filename = argv[1];
+	std::string filename_full_str = string(argv[1]);
+	string filename = filename_full_str.substr(0,filename_full_str.size()-5);
 	std::cout << "The second, optional parameter of the program is the target volume of the blowed up configuration (by default set up to 40000 A^3). \n";
 	double desired_volume = 40000;
 	if ( argc == 3 )

@@ -75,8 +75,7 @@ vector< vector<double> > read_points_from_zeopp_file( const char* filename , boo
  * This program read a collection of points in R^3 from a a file. Each point is a line
 **/ 
 vector< vector<double> > read_points_from_file( const char* filename )
-{
-	bool dbg = false;
+{	
 	//first check if the file exist:
 	std::ifstream in;
     in.open( filename );
@@ -86,9 +85,7 @@ vector< vector<double> > read_points_from_file( const char* filename )
 		throw "The file from which you are trying to read the persistence landscape do not exist. The program will now terminate \n";
 	}
 	std::string line;
-	double x, y, z;
-	double number;
-	char character;
+	double x, y, z;	
 	
 	vector< vector<double> > points;
     
