@@ -1,19 +1,20 @@
 CC = gcc
-CXXFLAGS  = -g -Wall -O3
+CXXFLAGS  = -g -Wall -O3 -std=c++11
 
-all: subsample_pore_surface create_megacell compute_Rips_persistence_periodic_domain
-subsample_pore_surface:
-	$(CXX) $(CXXFLAGS) -o subsample_pore_surface subsample_pore_surface.cpp
+HEADERS  = blow_up_to_mega_cell.h find_epsilon_net.h common_zeolites.h 
+HEADERS += random_subsampling_of_a_list_of_points.h 
+HEADERS += compute_distance_matrix_of_points_in_R3.h  
+HEADERS += read_zeopp_file.h compute_distance_matrix_relative.h
 
-create_megacell:
-	$(CXX) $(CXXFLAGS) -o create_megacell create_megacell.cpp
+BINARIES = subsample_pore_surface create_megacell compute_Rips_persistence_periodic_domain
 
-compute_Rips_persistence_periodic_domain:
-	$(CXX) $(CXXFLAGS) -o compute_Rips_persistence_periodic_domain compute_Rips_persistence_periodic_domain.cpp
+default: all
+all: $(BINARIES)
+
+%:: %.cpp $(HEADERS)
+	    $(CXX) $(CXXFLAGS) $< -o $@
 
 .PHONY: clean
 
 clean:
-	rm -f subsample_pore_surface
-	rm -f create_megacell
-	rm -f compute_Rips_persistence_periodic_domain
+	    rm -f $(BINARIES)
