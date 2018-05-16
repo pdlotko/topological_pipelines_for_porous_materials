@@ -1,3 +1,7 @@
 compute_Rips_persistence_periodic_domain
 create_megacell
 subsample_pore_surface
+pore_surface
+*.sa
+*.cssr
+*.cell

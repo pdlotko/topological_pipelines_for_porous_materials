@@ -36,23 +36,24 @@ int main( int argc , char** argv )
 	}
 	std::string cssr_filename = string(argv[1]);
 	std::string sa_filename = string(argv[2]);
-	double surface_area = atof( argv[2] );
+	double surface_area = atof( argv[3] );
 
 	std::string out_filename = string("out.sa");
 	if ( argc > 3 )
 	{
-		out_filename = string( argv[3] );
+		out_filename = string( argv[4] );
 	}
 
 	double how_many_points_per_surface_area = 0.5;	
 	if ( argc > 4 )
 	{
-		how_many_points_per_surface_area = atof( argv[3] );
+		how_many_points_per_surface_area = atof( argv[5] );
 	}
 
 	std::cout << "Here are the parameters of the program : " << std::endl;
 	std::cout << "SA Filename : " << sa_filename << std::endl;
 	std::cout << "Accessible surface area : " << surface_area << std::endl;
+	std::cout << "Output SA Filename : " << out_filename << std::endl;
 	std::cout << "Number of points per surface area : " << how_many_points_per_surface_area << std::endl;
 
 	//first read the points for thme .sa file
