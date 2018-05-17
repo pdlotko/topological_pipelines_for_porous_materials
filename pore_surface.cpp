@@ -25,12 +25,12 @@ using namespace std;
 int main( int argc , char** argv )
 {
 	std::cout << "Obligatory command line parameters: \n";
-	std::cout << " 1. (string) Input .cssr sa file name\n";		
-	std::cout << " 2. (string) Input .sa file name\n";
+	std::cout << " 1. (string) Input .cssr file name\n";		
+	std::cout << " 2. (string) Input .vsa file name\n";
 	std::cout << " 3. (double) accessible surface area [A^2].\n";
 	std::cout << "Optional parameters: \n";
-	std::cout << " 4. (double) number of points per surface area. Default: 0.5. \n";
-	std::cout << " 5. (string) output .sa file name. Default: out.sa\n";
+	std::cout << " 4. (double) density of points on surface area [1/A^2]. Default: 0.5. \n";
+	std::cout << " 5. (string) output .vsa file name. Default: out.vsa\n";
 	std::cout << " 6. (double) Target volume of supercell [A^3]. If not specified, no blow-up is performed.\n";
 	if ( argc - 1 < 3 )
 	{
@@ -39,7 +39,7 @@ int main( int argc , char** argv )
 	}
 
 	std::string cssr_filename = string(argv[1]);
-	std::string sa_filename = string(argv[2]);
+	std::string vsa_filename = string(argv[2]);
 	double surface_area = atof( argv[3] );
 
 	double how_many_points_per_surface_area = 0.5;	
@@ -48,7 +48,7 @@ int main( int argc , char** argv )
 		how_many_points_per_surface_area = atof( argv[4] );
 	}
 
-	std::string out_filename = string("out.sa");
+	std::string out_filename = string("out.vsa");
 	if ( argc - 1 >= 5 )
 	{
 		out_filename = string( argv[5] );
@@ -63,17 +63,17 @@ int main( int argc , char** argv )
 	std::cout << std::endl;
 	std::cout << "Here are the parameters of the program : " << std::endl;
 	std::cout << "CSSR Filename : " << cssr_filename << std::endl;
-	std::cout << "SA Filename : " << sa_filename << std::endl;
+	std::cout << "VSA Filename : " << vsa_filename << std::endl;
 	std::cout << "Accessible surface area [A^2] : " << surface_area << std::endl;
 	std::cout << "Output SA Filename : " << out_filename << std::endl;
-	std::cout << "Number of points per surface area : " << how_many_points_per_surface_area << std::endl;
+	std::cout << "Density of points on surface area [1/A^2] : " << how_many_points_per_surface_area << std::endl;
 	std::cout << "Desired volume [A^3] : " << desired_volume << std::endl;
 	std::cout << std::endl;
 
-	//first read the points for thme .sa file
-	std::cout << "Reading the points from the .sa file\n";
-	vector< vector<double> > points = read_points_from_zeopp_file( sa_filename.c_str() );
-	std::cout << points.size() << " points have been read from file " << sa_filename << std::endl;
+	//first read the points for thme .vsa file
+	std::cout << "Reading the points from the .vsa file\n";
+	vector< vector<double> > points = read_points_from_zeopp_file( vsa_filename.c_str() );
+	std::cout << points.size() << " points have been read from file " << vsa_filename << std::endl;
 
 	//write_points_to_file_in_vesta_format( points , "points_before_subsampling" );//TODO!!!!
 
@@ -98,7 +98,7 @@ int main( int argc , char** argv )
 	//subsampling viam max_min algorithm without proucing an all-to-all distance matrix. Should be used for large point clouds:
 	//std::vector< vector<double> > subsampled_points =  max_min_subset_certain_size< vector<double> , euclidena_distance >( points , size_of_subsample );
 
-	std::cout << "Numeber of points after subsampling : " << subsampled_points.size() << std::endl;
+	std::cout << "Number of points after subsampling : " << subsampled_points.size() << std::endl;
 
 
 	//For test only
@@ -140,7 +140,7 @@ int main( int argc , char** argv )
             write_mega_cell_vector_to_a_file( mega_cells_vector , mega_cell_vector_ss.str().c_str() );		
         } else {
             //TODO: Write cell vectors also for unit cell
-            std::cerr << "No blow-up requested - using unit cell." << std::endl;	
+            std::cout << "No blow-up requested - using unit cell." << std::endl;	
             write_points_to_file( subsampled_points, out_filename.c_str() );
         }
 

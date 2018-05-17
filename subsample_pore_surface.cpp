@@ -34,20 +34,19 @@ int main( int argc , char** argv )
 		std::cout << "Wrong number of parameters, the program will now terminate.\n";
                 return 1;
 	}
-	std::string cssr_filename = string(argv[1]);
-	std::string sa_filename = string(argv[2]);
-	double surface_area = atof( argv[3] );
+	std::string sa_filename = string(argv[1]);
+	double surface_area = atof( argv[2] );
 
 	std::string out_filename = string("out.sa");
-	if ( argc > 3 )
+	if ( argc -1 > 3 )
 	{
-		out_filename = string( argv[4] );
+		out_filename = string( argv[3] );
 	}
 
 	double how_many_points_per_surface_area = 0.5;	
-	if ( argc > 4 )
+	if ( argc-1 > 4 )
 	{
-		how_many_points_per_surface_area = atof( argv[5] );
+		how_many_points_per_surface_area = atof( argv[4] );
 	}
 
 	std::cout << "Here are the parameters of the program : " << std::endl;
