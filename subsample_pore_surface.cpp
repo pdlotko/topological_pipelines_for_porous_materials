@@ -15,6 +15,7 @@
 #include "read_zeopp_file.h"
 #include "random_subsampling_of_a_list_of_points.h"
 #include "find_epsilon_net.h"
+#include "compute_distance_matrix_of_points_in_R3.h"
 
 
 using namespace std;
@@ -102,7 +103,8 @@ int main( int argc , char** argv )
 	//subsamplng points via min-max algorithm using distance matrix. :
 
 
-	std::vector< std::vector<double> > subsampled_points = max_min_based_subsample_procedure( points , size_of_subsample );
+	//std::vector< std::vector<double> > subsampled_points = max_min_based_subsample_procedure( points , size_of_subsample );
+	std::vector< std::vector<double> > subsampled_points =  max_min_subset_certain_size< std::vector<double>, euclidena_distance >( points , size_of_subsample  );
 	points = subsampled_points;
 
 

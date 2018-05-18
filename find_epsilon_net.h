@@ -237,6 +237,8 @@ std::vector< double > compute_distance_from_point_to_any_other_point( const std:
 	return result;
 }//compute_distance_from_point_to_any_other_point
 
+
+
 /**
  * This is a procedure that compute max-min subset of a given cardinality of a set. Unlike in the previous procedure, where the input is a distance matrix, here we accept 
  * points of any metric space, and a function to compute distance between those points. This procedure should be used instead of the one that accept in the input the distance
