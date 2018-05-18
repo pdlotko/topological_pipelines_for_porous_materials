@@ -1,3 +1,1 @@
-./create_and_subsample_pore_surface h8325989 0.5 1.2 2000
-./create_megacell h8325989 40000
-./compute_Rips_persistence_periodic_domain h8325989 4.2
+./pore_surface h8325989.cssr h8325989.sa 576.916 0.5 out.sa 40000
