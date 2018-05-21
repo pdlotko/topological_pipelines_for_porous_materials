@@ -23,7 +23,6 @@ using namespace std;
  * Then it proceed to tne next points (rows) and add them, if they are at least epsilon away from the current epsilon net. 
  * If epsilon net do not exist, the algorithm will return the whole range between 0 and size of a matrix. 
 **/ 
-//aaa
 std::vector< size_t > find_epsilon_net( const std::vector< std::vector< double > >& lower_triangulad_distance_matrix , double epsilon )
 {
 	bool dbg = false;
@@ -326,7 +325,7 @@ std::vector< point_from_metric_space > max_min_subset_certain_size( const std::v
 template< typename point_from_metric_space > 
 size_t compute_cell_number( const point_from_metric_space& point , const std::vector< std::pair< double,double > > min_max , size_t number_of_cubes_direction_x , size_t number_of_cubes_direction_y , size_t number_of_cubes_direction_z  )
 {
-	bool dbg = true;
+	bool dbg = false;
 	size_t x_coord = ( ( point[0] - min_max[0].first )/( min_max[0].second - min_max[0].first ) ) * number_of_cubes_direction_x;
 	size_t y_coord = ( ( point[1] - min_max[1].first )/( min_max[1].second - min_max[1].first ) ) * number_of_cubes_direction_y;
 	size_t z_coord = ( ( point[2] - min_max[2].first )/( min_max[2].second - min_max[2].first ) ) * number_of_cubes_direction_z;
@@ -384,22 +383,28 @@ std::vector< point_from_metric_space > subsample_by_using_grid( const std::vecto
 	
 	//fill in the points_to_bins_vector vector. 
 	for ( size_t i = 0 ; i != points.size() ; ++i )
-	{
-		cerr << "i : " << i << endl;
-		cerr << points[i][0] << " " << points[i][1] << " " << points[i][2] << endl;
+	{		
+		if (dbg)cerr << points[i][0] << " " << points[i][1] << " " << points[i][2] << endl;
 		size_t cell_no = compute_cell_number( points[i] , min_max , number_of_cubes_direction_x , number_of_cubes_direction_y , number_of_cubes_direction_z );
-		cerr<< "aaa \n";
 		points_to_bins_vector.push_back( std::pair< point_from_metric_space , size_t >(points[i] , cell_no ) );
 		if ( dbg )
-		{
-			cerr << "i : " << i << endl;
-			cerr << "poits.size() : " << points.size() << endl;
-			cerr << "cell_no : " << cell_no << std::endl;			
+		{		
+			cerr << "cell_no : " << cell_no << std::endl;	
+			getchar();		
 		}
 	}	
 	
-	//sort the points_to_bins_vector accodring to the number of cell
+	//sort the points_to_bins_vector accodring to the number of cell the belong to
 	std::sort( points_to_bins_vector.begin() , points_to_bins_vector.end() , sort_according_second_coord<point_from_metric_space> );
+	
+	if ( dbg )
+	{
+		for ( size_t i = 0 ; i != points_to_bins_vector.size() ; ++i )
+		{
+			std::cout << points_to_bins_vector[i].first[0] << " "<< points_to_bins_vector[i].first[1] << " "<< points_to_bins_vector[i].first[2] << " " << points_to_bins_vector[i].second << std::endl;
+			if ( i%10 == 0 )getchar();
+		}
+	}
 	
 	//for every cell, check how many points we have, and sample how_many_points_to_sample_from_cube from it. 
 	std::vector< point_from_metric_space > result;
@@ -412,35 +417,49 @@ std::vector< point_from_metric_space > subsample_by_using_grid( const std::vecto
 		{
 			++next_position;
 		}
+		
 		//check how many elements are in this bin:
 		size_t how_many_elements_in_this_bin = next_position - position;
 		
+		if ( dbg )
+		{
+			std::cout << "position : " << position << ", next_position : " << next_position << std::endl;
+			std::cout << "how_many_elements_in_this_bin : " << how_many_elements_in_this_bin << std::endl;
+		}
+		
+		
 		//now, compare this number with how_many_points_to_sample_from_cube
-		if ( how_many_elements_in_this_bin < how_many_points_to_sample_from_cube )
+		if ( how_many_elements_in_this_bin > how_many_points_to_sample_from_cube )
 		{
 			//in this case we sample from the range. We should do it by doing some random_shuffle.
 			std::vector< size_t > to_sample;
 			to_sample.reserve( next_position - position );
 			for ( size_t i = position ; i != next_position ; ++i )to_sample.push_back( i );
-			std::random_shuffle( to_sample.begin() , to_sample.begin() + how_many_points_to_sample_from_cube );
+			std::random_shuffle( to_sample.begin() , to_sample.begin() + how_many_points_to_sample_from_cube );			
 			for ( size_t i = 0 ; i != how_many_points_to_sample_from_cube ; ++i )result.push_back( points_to_bins_vector[ to_sample[i] ].first );
 		}
 		else
 		{
 			//in this case, we use all of them. 
-			for ( size_t i = position ; i != next_position ; ++i )result.push_back	( points_to_bins_vector[i].first );
+			for ( size_t i = position ; i != next_position ; ++i )result.push_back( points_to_bins_vector[i].first );
 		}
+		
+		if ( dbg )
+		{
+			std::cout << "result.size() : " << result.size() << std::endl;
+			getchar();
+		}
+		
 		position = next_position;
 	}
 	
-	std::cerr << "Initial size : " << points_to_bins_vector.size() << ", subsampe size : " << result.size() << endl;
-	getchar();
+	
 	
 	return result;
 }//subsample_by_using_grid
 
 /** 
-* This procedure do a sbsampling taking into account parameters of the unit cell. Its parameters are: vector of points, maximal guaranteed Hausdorff distance of the subsampe from the initial poit cloud
+* This procedure do a subsampling taking into account parameters of the unit cell. Its parameters are: vector of points, maximal guaranteed Hausdorff distance of the subsampe from the initial poit cloud
 * and the sizes of the unit cell in directions x, y and z. 
 **/
 template< typename point_from_metric_space >
