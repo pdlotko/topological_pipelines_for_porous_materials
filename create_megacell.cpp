@@ -23,6 +23,8 @@ using namespace std;
 int main( int argc , char** argv )
 {
 	std::cout << "The obligatory parameter of the program is the cxxs file (with extension). \n";	
+	std::cout << "The second, optional parameter is a desired volume (set to 40000 A^3 by defailt). \n";	
+	std::cout << "The last, third optional parameter is a 0-1 parameter. If 0, the uniform blow up of the unit cell will be performed. In the other case, the non uniform blow up will be made (so that the resulting mega cell is as close to a cube as possible). 1 by default. \n";
 	std::cout << "Please note that prior to execution of this procedure, one should run the subsample_pore_surface, which will create a file with a point cloud sampled from the pores of the considered structure.\n";
 	if ( argc == 1 )  
 	{
@@ -33,10 +35,15 @@ int main( int argc , char** argv )
 	string filename = filename_full_str.substr(0,filename_full_str.size()-5);
 	std::cout << "The second, optional parameter of the program is the target volume of the blowed up configuration (by default set up to 40000 A^3). \n";
 	double desired_volume = 40000;
-	if ( argc == 3 )
+	if ( argc >= 3 )
 	{
 		desired_volume = atof( argv[2] );
 	}
+	int subsampling_method = 1;
+	if ( argc == 4 )
+	{
+		subsampling_method = atoi( argv[3] );
+	}	
 	
 	std::cerr << "Here are the parameters of the program : " << std::endl;
 	std::cout << "Filename : " << filename << std::endl;
@@ -63,8 +70,18 @@ int main( int argc , char** argv )
 	//how_many_times_in_each_direction[2] = 2;
 	//std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double> > > blowed_points = blow_up_to_mega_cell( subsampled_points , info_about_unit_cell , how_many_times_in_each_direction );
 	
+	std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double> > > blowed_points;
 	//Or we can blow it up till it reach the desired volume like in the example below. 
-	std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double> > > blowed_points = blow_up_till_reach_the_desided_volume( subsampled_points , info_about_unit_cell, how_many_times_in_each_direction , desired_volume );
+	if ( subsampling_method == 0 )
+	{
+		//This procedure blows up the same number fo times in each direction. If we start from not isotropic unit cell, we will end up with a non isotrpic mega cell.
+		blowed_points = blow_up_till_reach_the_desided_volume( subsampled_points , info_about_unit_cell, how_many_times_in_each_direction , desired_volume );
+	}
+	else
+	{
+		//This procedure blows up the unit cell so that the mega cell desired volume is approximated as closely as possible and in addition the mega cell is as close to isotropic cube as possible
+		blowed_points = blow_up_till_reach_the_desided_volume_and_produce_isotropic_mega_cell( subsampled_points , info_about_unit_cell, how_many_times_in_each_direction , desired_volume );
+	}
 	
 	std::vector< std::vector< double > > points_in_mega_cell = blowed_points.first;
 	std::vector< std::vector< double > > mega_cells_vector = blowed_points.second;	
@@ -72,7 +89,7 @@ int main( int argc , char** argv )
 	std::cerr << "Number of points in mega cell : " << points_in_mega_cell.size() << std::endl;	
 
 	//for test only
-	//write_points_to_file_in_vesta_format( points_in_mega_cell , "points_in_mega_cell" );
+	write_points_to_file_in_vesta_format( points_in_mega_cell , "points_in_mega_cell.xyz" );
 
 //STORING THE RESULTS IN THE FILES.
 	

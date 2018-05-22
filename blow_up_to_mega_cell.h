@@ -69,7 +69,7 @@ std::vector< std::vector< double > > compute_translation_vector( const std::vect
  * it should replicate the unit cell (as a vector of a size 3).
  * It provide as an output a pair: 
  * a vector< vector<double> > representing  points from the mega cell and
- * vector of vector of double, representing ector representation of the mega cell.
+ * vector of vector of double, representing ector representation of the mega cell. 
 **/
 std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double> > > blow_up_to_mega_cell( const std::vector< std::vector<double> >& points , const std::vector< double >& parameters_of_unit_cell , 
 														 std::vector<size_t> how_many_times_in_each_direction )
@@ -132,7 +132,10 @@ std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double>
 }//blow_up_to_mega_cell
 
 
-
+/**
+ * This procedure blow up the unit cell the same nunmber of times in each direction until the volume of the new cell 
+ * is the best approximation of the desired_volume.
+**/ 
 std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double> > > 
 blow_up_till_reach_the_desided_volume( const std::vector< std::vector<double> >& points , 
 									   const std::vector< double >& parameters_of_unit_cell , 
@@ -160,7 +163,7 @@ blow_up_till_reach_the_desided_volume( const std::vector< std::vector<double> >&
 	std::cerr << "volume_of_unit_cell : " << volume_of_unit_cell << endl;
 	
 	int number_of_times_we_should_blow_up_the_cell = (int)pow((desired_volume/volume_of_unit_cell),0.333333);
-	++number_of_times_we_should_blow_up_the_cell;//we increment this counter, since if it is 1, then we need to add one extra layer 
+	//++number_of_times_we_should_blow_up_the_cell;//we increment this counter, since if it is 1, then we need to add one extra layer 
 	 
 	std::cout << "To obtain the desired volume of : " << desired_volume << " we should blow up our unit cell of a volume : " << volume_of_unit_cell << " " << number_of_times_we_should_blow_up_the_cell << " times \n";
 	
@@ -169,7 +172,49 @@ blow_up_till_reach_the_desided_volume( const std::vector< std::vector<double> >&
 	how_many_times_in_each_direction.push_back( number_of_times_we_should_blow_up_the_cell );
 	how_many_times_in_each_direction.push_back( number_of_times_we_should_blow_up_the_cell );
 	
+	std::cout << "Volume of the obtained mega cell : " << number_of_times_we_should_blow_up_the_cell*number_of_times_we_should_blow_up_the_cell*number_of_times_we_should_blow_up_the_cell*
+	length_of_vector_in_x_direction*length_of_vector_in_y_direction*length_of_vector_in_z_direction << std::endl;
+	
 	return blow_up_to_mega_cell( points , parameters_of_unit_cell , how_many_times_in_each_direction );
 }//blow_up_till_reach_the_desided_volume
+
+
+
+
+
+/**
+ * This procedure blow up the unit cell so that it approximate as best as possibe cubic (isotropic) mega cell of a
+ * desired volume.
+**/ 
+std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double> > > 
+blow_up_till_reach_the_desided_volume_and_produce_isotropic_mega_cell( const std::vector< std::vector<double> >& points , 
+									   const std::vector< double >& parameters_of_unit_cell , 
+									   std::vector<size_t>& how_many_times_in_each_direction,
+									   double desired_volume = 40000 )
+{			
+	std::vector< std::vector< double > > translation_vector = compute_translation_vector( parameters_of_unit_cell );
+	double length_of_vector_in_x_direction = sqrt( translation_vector[0][0]*translation_vector[0][0] + translation_vector[0][1]*translation_vector[0][1] + translation_vector[0][2]*translation_vector[0][2] );
+	double length_of_vector_in_y_direction = sqrt( translation_vector[1][0]*translation_vector[1][0] + translation_vector[1][1]*translation_vector[1][1] + translation_vector[1][2]*translation_vector[1][2] );
+	double length_of_vector_in_z_direction = sqrt( translation_vector[2][0]*translation_vector[2][0] + translation_vector[2][1]*translation_vector[2][1] + translation_vector[2][2]*translation_vector[2][2] );
+	
+	double length_of_cube_of_desired_volume = pow((desired_volume),0.333333);			
+	
+	double volume =
+	(size_t)(length_of_cube_of_desired_volume/length_of_vector_in_x_direction)*length_of_vector_in_x_direction
+	*
+	(size_t)(length_of_cube_of_desired_volume/length_of_vector_in_y_direction)*length_of_vector_in_y_direction
+	*
+	(size_t)(length_of_cube_of_desired_volume/length_of_vector_in_z_direction)*length_of_vector_in_z_direction;
+	
+	std::cout << "Here is the volume of the mega cell : " << volume << std::endl;	
+	
+	
+	how_many_times_in_each_direction.clear();
+	how_many_times_in_each_direction.push_back( (size_t)(length_of_cube_of_desired_volume/length_of_vector_in_x_direction) );
+	how_many_times_in_each_direction.push_back( (size_t)(length_of_cube_of_desired_volume/length_of_vector_in_y_direction));
+	how_many_times_in_each_direction.push_back( (size_t)(length_of_cube_of_desired_volume/length_of_vector_in_z_direction) );
+	
+	return blow_up_to_mega_cell( points , parameters_of_unit_cell , how_many_times_in_each_direction );
+}//blow_up_till_reach_the_desided_volume_and_produce_isotropic_mega_cell
 
 

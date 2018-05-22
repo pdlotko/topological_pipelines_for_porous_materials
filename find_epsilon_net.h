@@ -319,6 +319,80 @@ std::vector< point_from_metric_space > max_min_subset_certain_size( const std::v
 }
 
 
+
+/**
+ * This is a procedure that compute an epsilon net of a set.The input consist of a collection of points in any metric space, a function to compute 
+ * distance between those points and an epsilon parameter (positive real number). The output consist of an epsolon net of a inotial collection of points.
+**/ 
+template< typename point_from_metric_space , typename distance_function >
+std::vector< point_from_metric_space > build_epsilon_net_gready_algorithm( const std::vector< point_from_metric_space >& points , double epsilon , bool deterministic = true )
+{
+	bool dbg = false;
+	if ( dbg ){std::cerr << "Entering max_min_subset_certain_size procedure (the one that accept the points from metric space).\n";getchar();}		
+	
+	std::vector< point_from_metric_space > result;	
+	std::vector< bool > belong_to_max_min_set( points.size() , false );
+	
+	size_t first = 0;
+	if ( !deterministic )
+	{
+		//in this case, the starting element is picked at random:
+		srand( time(0) );
+		first = (size_t)rand()%points.size();		
+	}
+	result.push_back( points[first] );
+	belong_to_max_min_set[first] = true;
+	
+	//this is a structure to keep the distances from the set of landmarks to all other points:
+	std::vector< std::vector< double > > distances;
+	
+	//now we compute a distance from the first point to any other point in the collection:
+	point_from_metric_space pt = points[ first ];
+	std::vector< double > dist_ = compute_distance_from_point_to_any_other_point<point_from_metric_space , distance_function>( points , pt );
+	distances.push_back( dist_ );
+	
+	
+	while ( true )
+	{
+		//find a point which is at least epsilpon away from any point in result vector:
+		size_t next_point = points.size()+1;
+		for ( size_t i = 0 ; i != points.size() ; ++i )
+		{
+			if ( belong_to_max_min_set[i] )continue;
+			double minimal_distance_to_max_min_set = std::numeric_limits<double>::max();
+			//here we have to find a minimal distance of this point from the points already in the max-min set:
+			for ( size_t point_in_max_min = 0 ; point_in_max_min != distances.size() ; ++point_in_max_min )
+			{
+				if ( minimal_distance_to_max_min_set > distances[point_in_max_min][i] )minimal_distance_to_max_min_set = distances[point_in_max_min][i];
+			}
+			if ( minimal_distance_to_max_min_set > epsilon ) 
+			{				
+				next_point = i;
+				break;
+			}
+		}
+		
+		if ( next_point == points.size()+1 )
+		{
+			//in this case, there is not point that is farther away than epsilon from the grid. We are done. Break the loop.
+			break;
+		}
+		
+		
+		//compute distance from the farthest_poin to any other point:
+		pt = points[ next_point ];
+		belong_to_max_min_set[ next_point ] = true;
+		std::vector< double > dist_2 = compute_distance_from_point_to_any_other_point<point_from_metric_space , distance_function>( points , pt );
+		distances.push_back( dist_2 );
+		result.push_back( points[ next_point ] );						
+	}
+	
+	return result;
+}//build_epsilon_net_gready_algorithm
+
+
+
+
 /**
  * This procedure takes as an input: min and max of a grid, and number of points in all direction. It computers the number of cell as if it was in a bitmap cubical complex
 **/

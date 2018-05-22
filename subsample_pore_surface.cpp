@@ -30,7 +30,7 @@ int main( int argc , char** argv )
 	std::cout << "Optional parameters: \n";
 	std::cout << "(3) output .sa file name (string). Default: out.sa. \n";
 	std::cout << "(4) number of points per surface area (double). Default: 0.5. \n";
-	std::cout << "(5) Subsample procedure to be used. The options are: 1 = Random subsample, 2 = max_min subsample and 3 = grid based subsample. Default: 2. \n";
+	std::cout << "(5) Subsample procedure to be used. The options are: 1 = Random subsample, 2 = max_min subsample and 3 = grid based subsample (*), 4 = greedy based epsilon net  (*) (with epsilon set to 1 A). Default: 2. \n Note that the algorithms marked with (*) do not guarantee the size of the output point cloud. \n";
 	if ( argc < 3 )
 	{
 		std::cout << "Wrong number of parameters, the program will now terminate.\n";
@@ -73,15 +73,7 @@ int main( int argc , char** argv )
 	size_t size_of_subsample = (size_t)surface_area*how_many_points_per_surface_area;
 	std::cout << "Number of points to subsample : " << size_of_subsample << std::endl;
 	
-	
-
-
-
-
-
-    //BEGIN FINDING SUBSAMPLE. Here we have a few ways of doing it.
-	////example of random subsample:
-	
+		
 	vector< vector<double> > subsampled_points;
 	if ( which_subsample_method == 1 )
 	{
@@ -114,17 +106,25 @@ int main( int argc , char** argv )
 			}
 			else
 			{
-				std::cerr << "UNKNOWN SUBSAMPLE METHOD, THE PROGRAM WILL NOW TERMINATE. \n";
-				return 1;				
+				if ( which_subsample_method == 4 )  
+				{
+					double epsilon = 2;
+					subsampled_points = build_epsilon_net_gready_algorithm< std::vector<double>, euclidena_distance >( points , epsilon );
+				}
+				else
+				{
+					std::cerr << "UNKNOWN SUBSAMPLE METHOD, THE PROGRAM WILL NOW TERMINATE. \n";
+					return 1;				
+				}
 			}
 		}
 	}
 	
-	std::cout << "Numeber of points after subsampling : " << subsampled_points.size() << std::endl;
+	std::cout << "Number of points after subsampling : " << subsampled_points.size() << std::endl;
 
 
 	//For test only
-	write_points_to_file_in_vesta_format( subsampled_points , "subsampled_points.xyz" );
+	//write_points_to_file_in_vesta_format( subsampled_points , "subsampled_points.xyz" );
 
 	write_points_to_file( subsampled_points , out_filename.c_str() );
 
