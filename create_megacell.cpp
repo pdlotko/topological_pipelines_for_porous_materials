@@ -39,10 +39,10 @@ int main( int argc , char** argv )
 	{
 		desired_volume = atof( argv[2] );
 	}
-	int subsampling_method = 1;
+	int blow_up_scheme = 1;
 	if ( argc == 4 )
 	{
-		subsampling_method = atoi( argv[3] );
+		blow_up_scheme = atoi( argv[3] );
 	}	
 	
 	std::cerr << "Here are the parameters of the program : " << std::endl;
@@ -72,7 +72,7 @@ int main( int argc , char** argv )
 	
 	std::pair< std::vector< std::vector<double> > , std::vector< std::vector<double> > > blowed_points;
 	//Or we can blow it up till it reach the desired volume like in the example below. 
-	if ( subsampling_method == 0 )
+	if ( blow_up_scheme == 0 )
 	{
 		//This procedure blows up the same number fo times in each direction. If we start from not isotropic unit cell, we will end up with a non isotrpic mega cell.
 		blowed_points = blow_up_till_reach_the_desided_volume( subsampled_points , info_about_unit_cell, how_many_times_in_each_direction , desired_volume );

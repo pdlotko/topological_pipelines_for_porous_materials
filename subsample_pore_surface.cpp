@@ -40,19 +40,20 @@ int main( int argc , char** argv )
 	double surface_area = atof( argv[2] );
 
 	std::string out_filename = string("out.sa");
-	if ( argc > 2 )
+	if ( argc > 3 )
 	{
 		out_filename = string( argv[3] );
 	}
 
 	double how_many_points_per_surface_area = 0.5;	
-	if ( argc > 3 )
+	if ( argc > 4 )
 	{
 		how_many_points_per_surface_area = atof( argv[4] );
 	}
 	
+	
 	int which_subsample_method = 2;
-	if ( argc > 4 )
+	if ( argc > 5 )
 	{
 		which_subsample_method = atoi( argv[5] );
 	}
@@ -71,7 +72,7 @@ int main( int argc , char** argv )
 
 
 	size_t size_of_subsample = (size_t)surface_area*how_many_points_per_surface_area;
-	std::cout << "Number of points to subsample : " << size_of_subsample << std::endl;
+	std::cout << "We are going to subsample : " << size_of_subsample << " points." << std::endl;
 	
 		
 	vector< vector<double> > subsampled_points;
@@ -80,47 +81,39 @@ int main( int argc , char** argv )
 		//random subsample
 		subsampled_points = random_subsample( points , size_of_subsample );
 	}
+	else if ( which_subsample_method == 2 )
+	{
+		//max_min subsample
+		//Less memory efficient, but sometimes faster version.
+		//std::vector< std::vector<double> > subsampled_points = max_min_based_subsample_procedure( points , size_of_subsample );
+		//More memory efficient, but sometimes slower version.
+		subsampled_points =  max_min_subset_certain_size< std::vector<double>, euclidena_distance >( points , size_of_subsample  );
+	}
+	else if ( which_subsample_method == 3 )
+	{
+		//grid based subsample. Over here we assume that the size of the cube is to be at least 1 A^3.
+		std::vector< std::pair< double,double > > ranges = find_ranges_of_point_cloud( points );
+		double weight = 1;
+		size_t number_of_cubes_direction_x = (size_t)(weight*(ranges[0].second - ranges[0].first));
+		size_t number_of_cubes_direction_y = (size_t)(weight*(ranges[1].second - ranges[1].first));
+		size_t number_of_cubes_direction_z = (size_t)(weight*(ranges[2].second - ranges[2].first)); 
+		size_t how_many_points_to_sample_from_cube = 1;
+		std::cout << "Here are the sizes of the cubical grid usied for subsampling : \n In direstion x : " << number_of_cubes_direction_x << "\n In direction y : " << number_of_cubes_direction_y << "\n In direction z : " << number_of_cubes_direction_z << std::endl;			
+		subsampled_points = subsample_by_using_grid( points , number_of_cubes_direction_x , number_of_cubes_direction_y , number_of_cubes_direction_z , how_many_points_to_sample_from_cube  );
+	}
+	else if ( which_subsample_method == 4 )  
+	{
+		double epsilon = 2;
+		subsampled_points = build_epsilon_net_gready_algorithm< std::vector<double>, euclidena_distance >( points , epsilon );
+	}
 	else
 	{
-		if ( which_subsample_method == 2 )
-		{
-			//max_min subsample
-			//Less memory efficient, but sometimes faster version.
-			//std::vector< std::vector<double> > subsampled_points = max_min_based_subsample_procedure( points , size_of_subsample );
-			//More memory efficient, but sometimes slower version.
-			subsampled_points =  max_min_subset_certain_size< std::vector<double>, euclidena_distance >( points , size_of_subsample  );
-		}
-		else
-		{
-			if ( which_subsample_method == 3 )
-			{
-				//grid based subsample. Over here we assume that the size of the cube is to be at least 1 A^3.
-				std::vector< std::pair< double,double > > ranges = find_ranges_of_point_cloud( points );
-				double weight = 1;
-				size_t number_of_cubes_direction_x = (size_t)(weight*(ranges[0].second - ranges[0].first));
-				size_t number_of_cubes_direction_y = (size_t)(weight*(ranges[1].second - ranges[1].first));
-				size_t number_of_cubes_direction_z = (size_t)(weight*(ranges[2].second - ranges[2].first)); 
-				size_t how_many_points_to_sample_from_cube = 1;
-				std::cout << "Here are the sizes of the cubical grid usied for subsampling : \n In direstion x : " << number_of_cubes_direction_x << "\n In direction y : " << number_of_cubes_direction_y << "\n In direction z : " << number_of_cubes_direction_z << std::endl;			
-				subsampled_points = subsample_by_using_grid( points , number_of_cubes_direction_x , number_of_cubes_direction_y , number_of_cubes_direction_z , how_many_points_to_sample_from_cube  );
-			}
-			else
-			{
-				if ( which_subsample_method == 4 )  
-				{
-					double epsilon = 2;
-					subsampled_points = build_epsilon_net_gready_algorithm< std::vector<double>, euclidena_distance >( points , epsilon );
-				}
-				else
-				{
-					std::cerr << "UNKNOWN SUBSAMPLE METHOD, THE PROGRAM WILL NOW TERMINATE. \n";
-					return 1;				
-				}
-			}
-		}
+		std::cerr << "UNKNOWN SUBSAMPLE METHOD, THE PROGRAM WILL NOW TERMINATE. \n";
+		return 1;				
 	}
 	
-	std::cout << "Number of points after subsampling : " << subsampled_points.size() << std::endl;
+		
+	std::cout << "Number of subsampled points : " << subsampled_points.size() << std::endl;
 
 
 	//For test only
