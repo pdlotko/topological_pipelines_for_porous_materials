@@ -7,7 +7,7 @@ HEADERS += compute_distance_matrix_of_points_in_R3.h
 HEADERS += read_zeopp_file.h compute_distance_matrix_relative.h
 
 BINARIES = subsample_pore_surface create_megacell compute_Rips_persistence_periodic_domain
-BINARIES += pore_surface
+BINARIES += pore_surface distance_matrix
 
 default: all
 all: $(BINARIES)
