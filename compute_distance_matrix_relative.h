@@ -107,7 +107,7 @@ void write_distance_matrix_to_a_file( const std::vector< std::vector< double > >
 	{
 		for ( size_t j = 0 ; j != distance_matrix[i].size() ; ++j )
 		{
-			out << distance_matrix[i][j] << ",";
+			out << distance_matrix[i][j] << ";";
 		}
 		out << std::endl;
 	}
